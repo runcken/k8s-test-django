@@ -3,9 +3,13 @@ kind: CronJob
 metadata:
   name: session-cleanup
 spec:
-  schedule: "0 0 * * *"
+  schedule: "* * * * *"
+  startingDeadlineSeconds: 10
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
   jobTemplate:
     spec:
+      ttlSecondsAfterFinished: 60
       template:
         spec:
           containers:
@@ -36,3 +40,5 @@ spec:
                   name: app-secrets
                   key: DATABASE_URL
           restartPolicy: OnFailure
+      backoffLimit: 1
+      ttlSecondsAfterFinished: 60
