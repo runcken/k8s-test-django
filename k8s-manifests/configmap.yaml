@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+data:
+  # Django настройки
+  DEBUG: "True"
+  ALLOWED_HOSTS: "*"
+  # PostgreSQL настройки (без пароля)
+  POSTGRES_DB: "test_k8s"
+  POSTGRES_USER: "test_k8s"
