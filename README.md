@@ -26,11 +26,7 @@ $ minikube status
 $ minikube get nodes
 ```
 
-### Загрузка с Docker-образа. Перейти в папку с Dockerfilesession-cleanup-job.yaml
-kubectl apply -f session-cleanup-job.yaml - вручную
-
-sesion-cleanup-cronjob.yaml
-kubectl apply -f session-cleanup-cronjob.yaml - авто
+### Загрузка с Docker-образа. Перейти в папку с Dockerfile
 
 ```shell
 $ docker build -t django_app:latest .
@@ -85,80 +81,6 @@ $ kubectl get all
 ```shell
 $ kubectl rollout restart deployment/django
 ```
-
-
-
-
-
-
-
-
-
-
-
-222222
-создать k8s-manifests
-
-secrets.yaml
-configmap.yaml
-secrets.example.yaml
-
-применить 
-kubectl apply -f secrets.yaml
-kubectl apply -f configmap.yaml
-kubectl apply -f postgres-deployment.yaml
-kubectl apply -f django-deployment.yaml
-
-
-история
-
-kubectl roolout history deployment/django
-
-откат
-
-kubectl rollout undo deployment/django
-
-применить изменения
-
-kubectl apply -f configmap.yaml
-kubectl rollout restart deployment/django
-
-
-ingress
-
-в configmap.yaml
-отключить debug
-добавить allowed hosts star-burger.test
-применить изменения
-
-kubectl apply -f configmap.yaml
-kubectl rollout restart deployment/django
-
-minikube addons enable ingress
-kubectl get pods -n ingress-nginx
-
-django-deployment.yaml
-NodePort -> ClusterIP
-
-применить
-
-создать и применить
-kubectl apply -f ingress.yaml
-kubectl get ingress
- 
-добавить в etc/hosts
-
-echo "$(minikube ip) star-burger.test" | sudo tee -a /etc/hosts
-
-clear sessions
-
-
-session-cleanup-job.yaml
-kubectl apply -f session-cleanup-job.yaml - вручную
-
-sesion-cleanup-cronjob.yaml
-kubectl apply -f session-cleanup-cronjob.yaml - авто
-
 
 
 
