@@ -54,6 +54,7 @@ $ kubectl apply -f django-deployment.yaml
 $ kubectl apply -f ingress.yaml
 $ kubectl apply -f session-cleanup-job.yaml - для очистки сессий пользователей вручную
 $ kubectl apply -f session-cleanup-cronjob.yaml - для очистки сесси1 пользователей по расписанию
+$ kubectl apply -f migrate-job.yaml - для применения миграций
 ```
 
 ### Создать суперпользователя
