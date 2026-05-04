@@ -129,6 +129,19 @@ kubectl get ingress
 
 echo "$(minikube ip) star-burger.test" | sudo tee -a /etc/hosts
 
+clear sessions
+
+
+session-cleanup-job.yaml
+kubectl apply -f session-cleanup-job.yaml - вручную
+
+sesion-cleanup-cronjob.yaml
+kubectl apply -f session-cleanup-cronjob.yaml - авто
+
+
+
+
+
 
 
 

@@ -1,0 +1,38 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: session-cleanup
+spec:
+  schedule: "0 0 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: django-cleanup
+            image: django_app:latest
+            imagePullPolicy: Never
+            command: ["python", "manage.py"]
+            args: ["clearsessions"]
+            env:
+            - name: DEBUG
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: DEBUG
+            - name: ALLOWED_HOSTS
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: ALLOWED_HOSTS
+            - name: SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: SECRET_KEY
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: DATABASE_URL
+          restartPolicy: OnFailure
