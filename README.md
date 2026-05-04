@@ -6,75 +6,95 @@
 
 ## Как подготовить окружение к локальной разработке
 
-Код в репозитории полностью докеризирован, поэтому для запуска приложения вам понадобится Docker. Инструкции по его установке ищите на официальных сайтах:
+Код в репозитории полностью докеризирован, поэтому для запуска приложения понадобится Docker. Инструкции по его установке на официальных сайтах:
 
 - [Get Started with Docker](https://www.docker.com/get-started/)
 
-Вместе со свежей версией Docker к вам на компьютер автоматически будет установлен Docker Compose. Дальнейшие инструкции будут его активно использовать.
 
-## Как запустить сайт для локальной разработки
+## Как запустить сайт для локальной разработки в Minikube
 
-Запустите базу данных и сайт:
-
-```shell
-$ docker compose up
-```
-
-В новом терминале, не выключая сайт, запустите несколько команд:
+### Запустить Minikube с драйвером Docker
 
 ```shell
-$ docker compose run --rm web ./manage.py migrate  # создаём/обновляем таблицы в БД
-$ docker compose run --rm web ./manage.py createsuperuser  # создаём в БД учётку суперпользователя
+$ minikube start --driver=docker
 ```
 
-Готово. Сайт будет доступен по адресу [http://127.0.0.1:8080](http://127.0.0.1:8080). Вход в админку находится по адресу [http://127.0.0.1:8000/admin/](http://127.0.0.1:8000/admin/).
-
-## Как вести разработку
-
-Все файлы с кодом django смонтированы внутрь докер-контейнера, чтобы Nginx Unit сразу видел изменения в коде и не требовал постоянно пересборки докер-образа -- достаточно перезапустить сервисы Docker Compose.
-
-### Как обновить приложение из основного репозитория
-
-Чтобы обновить приложение до последней версии подтяните код из центрального окружения и пересоберите докер-образы:
-
-``` shell
-$ git pull
-$ docker compose build
-```
-
-После обновлении кода из репозитория стоит также обновить и схему БД. Вместе с коммитом могли прилететь новые миграции схемы БД, и без них код не запустится.
-
-Чтобы не гадать заведётся код или нет — запускайте при каждом обновлении команду `migrate`. Если найдутся свежие миграции, то команда их применит:
+### Проверить статус
 
 ```shell
-$ docker compose run --rm web ./manage.py migrate
-…
-Running migrations:
-  No migrations to apply.
+$ minikube status
+$ minikube get nodes
 ```
 
-### Как добавить библиотеку в зависимости
+### Загрузка с Docker-образа. Перейти в папку с Dockerfilesession-cleanup-job.yaml
+kubectl apply -f session-cleanup-job.yaml - вручную
 
-В качестве менеджера пакетов для образа с Django используется pip с файлом requirements.txt. Для установки новой библиотеки достаточно прописать её в файл requirements.txt и запустить сборку докер-образа:
+sesion-cleanup-cronjob.yaml
+kubectl apply -f session-cleanup-cronjob.yaml - авто
 
-```sh
-$ docker compose build web
+```shell
+$ docker build -t django_app:latest .
 ```
 
-Аналогичным образом можно удалять библиотеки из зависимостей.
+### Загрузить образ в Minikube
 
-<a name="env-variables"></a>
-## Переменные окружения
+```shell
+$ minikube image load django_app:latest
+```
 
-Образ с Django считывает настройки из переменных окружения:
+### Перейти в папку manifests. Включить ingress
 
-`SECRET_KEY` -- обязательная секретная настройка Django. Это соль для генерации хэшей. Значение может быть любым, важно лишь, чтобы оно никому не было известно. [Документация Django](https://docs.djangoproject.com/en/3.2/ref/settings/#secret-key).
+```shell
+$ minikube addons enable ingress
+```
 
-`DEBUG` -- настройка Django для включения отладочного режима. Принимает значения `TRUE` или `FALSE`. [Документация Django](https://docs.djangoproject.com/en/3.2/ref/settings/#std:setting-DEBUG).
+### Применить манифесты
 
-`ALLOWED_HOSTS` -- настройка Django со списком разрешённых адресов. Если запрос прилетит на другой адрес, то сайт ответит ошибкой 400. Можно перечислить несколько адресов через запятую, например `127.0.0.1,192.168.0.1,site.test`. [Документация Django](https://docs.djangoproject.com/en/3.2/ref/settings/#allowed-hosts).
+```shell
+$ kubectl apply -f secrets.yaml
+$ kubectl apply -f configmap.yaml
+$ kubectl apply -f postgres-deployment.yaml
+$ kubectl apply -f django-deployment.yaml
+$ kubectl apply -f ingress.yaml
+$ kubectl apply -f session-cleanup-job.yaml - для очистки сессий пользователей вручную
+$ kubectl apply -f session-cleanup-cronjob.yaml - для очистки сесси1 пользователей по расписанию
+```
 
-`DATABASE_URL` -- адрес для подключения к базе данных PostgreSQL. Другие СУБД сайт не поддерживает. [Формат записи](https://github.com/jacobian/dj-database-url#url-schema).
+### Создать суперпользователя
+
+```shell
+$ kubectl exec -it deployment/django -- python manage.py createsuperuser
+```
+
+### Добавить домен в /etc/hosts
+
+```shell
+$ echo "$(minikube ip) star-burger.test" | sudo tee -a /etc/hosts
+```
+
+Сайт будет доступен по http://star-burger.test
+
+### Проверка статуса всех ресурсов
+
+```shell
+$ kubectl get all
+```
+
+### Перезапуск Django
+
+```shell
+$ kubectl rollout restart deployment/django
+```
+
+
+
+
+
+
+
+
+
+
 
 222222
 создать k8s-manifests
@@ -88,6 +108,7 @@ kubectl apply -f secrets.yaml
 kubectl apply -f configmap.yaml
 kubectl apply -f postgres-deployment.yaml
 kubectl apply -f django-deployment.yaml
+
 
 история
 

@@ -3,7 +3,7 @@ kind: CronJob
 metadata:
   name: session-cleanup
 spec:
-  schedule: "* * * * *"
+  schedule: "0 * * * *"
   startingDeadlineSeconds: 10
   successfulJobsHistoryLimit: 3
   failedJobsHistoryLimit: 3
