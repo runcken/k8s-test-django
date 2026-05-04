@@ -85,7 +85,7 @@ secrets.example.yaml
 
 применить 
 kubectl apply -f secrets.yaml
-kubectl apply configmap.yaml
+kubectl apply -f configmap.yaml
 kubectl apply -f postgres-deployment.yaml
 kubectl apply -f django-deployment.yaml
 
@@ -96,6 +96,43 @@ kubectl roolout history deployment/django
 откат
 
 kubectl rollout undo deployment/django
+
+применить изменения
+
+kubectl apply -f configmap.yaml
+kubectl rollout restart deployment/django
+
+
+ingress
+
+в configmap.yaml
+отключить debug
+добавить allowed hosts star-burger.test
+применить изменения
+
+kubectl apply -f configmap.yaml
+kubectl rollout restart deployment/django
+
+minikube addons enable ingress
+kubectl get pods -n ingress-nginx
+
+django-deployment.yaml
+NodePort -> ClusterIP
+
+применить
+
+создать и применить
+kubectl apply -f ingress.yaml
+kubectl get ingress
+ 
+добавить в etc/hosts
+
+echo "$(minikube ip) star-burger.test" | sudo tee -a /etc/hosts
+
+
+
+
+
 
 
 

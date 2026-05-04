@@ -4,8 +4,8 @@ metadata:
   name: app-config
 data:
   # Django настройки
-  DEBUG: "True"
-  ALLOWED_HOSTS: "*"
+  DEBUG: "False"
+  ALLOWED_HOSTS: "star-burger.test,localhost,127.0.0.1"
   # PostgreSQL настройки (без пароля)
   POSTGRES_DB: "test_k8s"
   POSTGRES_USER: "test_k8s"
